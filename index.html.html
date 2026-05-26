@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador Stone — Óticas</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green:       #00A651;
+    --green-dark:  #007A3D;
+    --green-mid:   #00C060;
+    --green-light: #E6F7EE;
+    --black:       #0D0D0D;
+    --gray-800:    #222;
+    --gray-600:    #555;
+    --gray-400:    #999;
+    --gray-200:    #E8E8E8;
+    --gray-100:    #F6F6F6;
+    --white:       #FFFFFF;
+    --radius:      18px;
+    --radius-sm:   11px;
+    --shadow:      0 2px 20px rgba(0,0,0,0.07);
+    --shadow-lg:   0 12px 48px rgba(0,0,0,0.16);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #EDEEE9;
+    color: var(--black);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--black);
+    padding: 0 24px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--white);
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .logo-pill {
+    background: var(--green);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+  .header-tag {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  /* ── HERO STRIP ── */
+  .hero-strip {
+    background: var(--green);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.35rem;
+    color: white;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+  }
+  .hero-title span { opacity: 0.7; font-weight: 400; font-size: 0.85rem; display: block; margin-top: 3px; font-family: 'DM Sans', sans-serif; letter-spacing: 0; }
+  .hero-badge {
+    background: rgba(255,255,255,0.18);
+    border: 1.5px solid rgba(255,255,255,0.35);
+    color: white;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 28px 16px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 26px 28px;
+    box-shadow: var(--shadow);
+  }
+  .card-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-label::before {
+    content: '';
+    display: inline-block;
+    width: 3px; height: 13px;
+    background: var(--green);
+    border-radius: 2px;
+  }
+
+  /* ── FIELDS ── */
+  .fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media(max-width:560px){ .fields-row { grid-template-columns: 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gray-600);
+  }
+  .field input, .field select {
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 13px 16px;
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--black);
+    background: var(--gray-100);
+    outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+    appearance: none; -webkit-appearance: none;
+  }
+  .field input:focus, .field select:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(0,166,81,0.12);
+    background: white;
+  }
+  .field input.error, .field select.error {
+    border-color: #e53e3e;
+    box-shadow: 0 0 0 3px rgba(229,62,62,0.09);
+  }
+  .field .err-msg {
+    font-size: 0.73rem;
+    color: #e53e3e;
+    display: none;
+  }
+  .field.has-error .err-msg { display: block; }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px !important;
+    cursor: pointer;
+  }
+
+  /* TAXA DISPLAY */
+  .taxa-display {
+    margin-top: 16px;
+    background: var(--green-light);
+    border: 1.5px solid rgba(0,166,81,0.25);
+    border-radius: var(--radius-sm);
+    padding: 13px 18px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .taxa-display.visible { display: flex; }
+  .taxa-display-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--green-dark);
+  }
+  .taxa-display-value {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--green-dark);
+  }
+  .taxa-lock {
+    font-size: 0.7rem;
+    color: var(--green-dark);
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* BOTÕES */
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+  }
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 14px 26px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: var(--green);
+    color: white;
+    flex: 1;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,166,81,0.28);
+  }
+  .btn-primary:hover { background: var(--green-dark); box-shadow: 0 6px 22px rgba(0,166,81,0.38); transform: translateY(-1px); }
+  .btn-secondary {
+    background: var(--gray-100);
+    color: var(--gray-600);
+    border: 2px solid var(--gray-200);
+  }
+  .btn-secondary:hover { background: var(--gray-200); transform: translateY(-1px); }
+  .btn:active { transform: scale(0.97) !important; }
+
+  /* ── RESULTADO ── */
+  #resultado-card {
+    display: none;
+    background: var(--black);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    animation: riseUp 0.38s cubic-bezier(0.22,1,0.36,1);
+  }
+  @keyframes riseUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .resultado-top {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .resultado-titulo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: white;
+  }
+  .resultado-sub {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.4);
+    margin-top: 2px;
+  }
+  .resultado-ok-badge {
+    background: var(--green);
+    color: white;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 5px 13px;
+    border-radius: 20px;
+  }
+
+  .resultado-body {
+    padding: 22px 28px 26px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media(max-width:500px){ .resultado-body { grid-template-columns: 1fr; } }
+
+  .res-block {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .res-block.big {
+    grid-column: span 2;
+    background: var(--green);
+    border-color: var(--green-mid);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  @media(max-width:500px){ .res-block.big { grid-column: span 1; } }
+  .res-block.accent {
+    background: rgba(0,166,81,0.14);
+    border-color: rgba(0,166,81,0.28);
+  }
+  .res-lbl {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 7px;
+  }
+  .res-block.big .res-lbl { color: rgba(255,255,255,0.75); margin-bottom: 4px; }
+  .res-block.accent .res-lbl { color: rgba(0,210,100,0.7); }
+  .res-val {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: white;
+    letter-spacing: -0.5px;
+  }
+  .res-block.accent .res-val { color: #5EE89A; }
+  .res-note {
+    font-size: 0.73rem;
+    color: rgba(255,255,255,0.35);
+    margin-top: 4px;
+  }
+  .res-block.big .res-note { color: rgba(255,255,255,0.65); font-size: 0.78rem; }
+  .res-block.big .res-val { font-size: 1.65rem; }
+
+  .resultado-footer {
+    padding: 0 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .btn-whatsapp {
+    width: 100%;
+    background: #25D366;
+    color: white;
+    justify-content: center;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 16px rgba(37,211,102,0.28);
+    padding: 15px;
+  }
+  .btn-whatsapp:hover { background: #1EB859; box-shadow: 0 6px 22px rgba(37,211,102,0.38); transform: translateY(-1px); }
+
+  .copy-ok {
+    display: none;
+    background: var(--green-light);
+    border: 1.5px solid var(--green);
+    color: var(--green-dark);
+    border-radius: var(--radius-sm);
+    padding: 11px 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-align: center;
+    animation: fadeIn 0.25s;
+  }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+  /* ── TABELA DE CONDIÇÕES ── */
+  .cond-table-wrap { overflow-x: auto; }
+  table.cond-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.87rem;
+  }
+  table.cond-table th {
+    background: var(--gray-100);
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--gray-600);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  table.cond-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-800);
+  }
+  table.cond-table tr:last-child td { border-bottom: none; }
+  table.cond-table tr.active-row td { background: var(--green-light); font-weight: 600; }
+  table.cond-table tr.active-row td:nth-child(2) { color: var(--green-dark); }
+  .lock-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--gray-100);
+    border: 1.5px solid var(--gray-200);
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 0.72rem;
+    color: var(--gray-400);
+    font-weight: 600;
+    margin-top: 14px;
+  }
+
+  /* FOOTER */
+  .footer-note {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--gray-400);
+    padding-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    Stone
+    <span class="logo-pill">Óticas</span>
+  </div>
+  <span class="header-tag">Simulador Comercial</span>
+</header>
+
+<div class="hero-strip">
+  <div class="hero-title">
+    Simulador de Vendas
+    <span>Condições especiais para óticas · Parcelamento 10x a 18x</span>
+  </div>
+  <div class="hero-badge">Proposta 2 · 10x–18x</div>
+</div>
+
+<div class="container">
+
+  <!-- CARD SIMULAÇÃO -->
+  <div class="card">
+    <div class="card-label">Simular venda</div>
+
+    <div class="fields-row">
+      <div class="field" id="f-valor">
+        <label>Valor da venda (R$)</label>
+        <input type="text" id="valor-liquido" placeholder="R$ 1.000,00" inputmode="numeric" autocomplete="off">
+        <span class="err-msg">Informe um valor válido maior que zero.</span>
+      </div>
+
+      <div class="field" id="f-parcelas">
+        <label>Parcelamento</label>
+        <select id="parcelas" onchange="onParcelChange()">
+          <option value="">Selecione...</option>
+          <option value="10">Crédito 10x</option>
+          <option value="11">Crédito 11x</option>
+          <option value="12">Crédito 12x</option>
+          <option value="13">Crédito 13x</option>
+          <option value="14">Crédito 14x</option>
+          <option value="15">Crédito 15x</option>
+          <option value="16">Crédito 16x</option>
+          <option value="17">Crédito 17x</option>
+          <option value="18">Crédito 18x</option>
+        </select>
+        <span class="err-msg">Selecione o parcelamento.</span>
+      </div>
+    </div>
+
+    <!-- TAXA AUTO-DISPLAY -->
+    <div class="taxa-display" id="taxa-display">
+      <div>
+        <div class="taxa-display-label">Taxa promocional aplicada</div>
+        <div class="taxa-lock">🔒 Condição contratual — não editável</div>
+      </div>
+      <div class="taxa-display-value" id="taxa-display-val">—</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="calcular()">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        Calcular
+      </button>
+      <button class="btn btn-secondary" onclick="limpar()">Limpar</button>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="resultado-card">
+    <div class="resultado-top">
+      <div>
+        <div class="resultado-titulo">Resultado da Simulação</div>
+        <div class="resultado-sub" id="r-modalidade-sub">—</div>
+      </div>
+      <div class="resultado-ok-badge">✓ Calculado</div>
+    </div>
+
+    <div class="resultado-body">
+      <!-- Linha destaque — cliente paga -->
+      <div class="res-block big">
+        <div>
+          <div class="res-lbl">Cliente final paga</div>
+          <div class="res-val" id="r-total">—</div>
+          <div class="res-note" id="r-parcela-note">—</div>
+        </div>
+        <div style="text-align:right">
+          <div class="res-lbl">Parcela</div>
+          <div class="res-val" id="r-parcela-val" style="font-size:1.2rem">—</div>
+        </div>
+      </div>
+
+      <!-- Valor da venda -->
+      <div class="res-block accent">
+        <div class="res-lbl">Valor da venda</div>
+        <div class="res-val" id="r-liquido">—</div>
+        <div class="res-note">Recebimento garantido</div>
+      </div>
+
+      <!-- Taxa -->
+      <div class="res-block">
+        <div class="res-lbl">Taxa promocional</div>
+        <div class="res-val" id="r-taxa-pct">—</div>
+        <div class="res-note" id="r-taxa-valor">—</div>
+      </div>
+    </div>
+
+    <div class="resultado-footer">
+      <button class="btn btn-whatsapp" onclick="copiarProposta()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Copiar proposta para WhatsApp
+      </button>
+      <div class="copy-ok" id="copy-ok">✓ Proposta copiada! Cole no WhatsApp.</div>
+    </div>
+  </div>
+
+  <!-- CONDIÇÕES PROMOCIONAIS -->
+  <div class="card">
+    <div class="card-label">Condições promocionais · Óticas</div>
+    <div class="cond-table-wrap">
+      <table class="cond-table" id="cond-table">
+        <thead>
+          <tr>
+            <th>Modalidade</th>
+            <th>Taxa promocional</th>
+            <th>Uso comercial</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-cond"></tbody>
+      </table>
+    </div>
+    <div class="lock-tag">🔒 Condições fixas — Proposta 2 Stone</div>
+  </div>
+
+  <div class="footer-note">Stone · Simulador Comercial para Óticas · Condições da Proposta 2</div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// TAXAS FIXAS — extraídas da Proposta 2 Stone
+// NÃO EDITÁVEIS pelo usuário
+// ─────────────────────────────────────────────
+const TAXAS = Object.freeze({
+  10: { taxa: 9.34,  uso: 'Principal faixa de venda da ótica.' },
+  11: { taxa: 10.33, uso: 'Transição para parcela menor.' },
+  12: { taxa: 10.34, uso: 'Condição forte para ticket maior.' },
+  13: { taxa: 12.49, uso: 'Mais flexibilidade na negociação.' },
+  14: { taxa: 13.24, uso: 'Apoio para combos e upgrades.' },
+  15: { taxa: 13.99, uso: 'Parcela menor com prazo estendido.' },
+  16: { taxa: 14.74, uso: 'Facilita compras familiares.' },
+  17: { taxa: 14.83, uso: 'Alternativa para ticket elevado.' },
+  18: { taxa: 14.84, uso: 'Menor parcela para maior acesso.' },
+});
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  mascaraMoeda(document.getElementById('valor-liquido'));
+  renderCondTable();
+});
+
+// ─────────────────────────────────────────────
+// MÁSCARA MONETÁRIA
+// ─────────────────────────────────────────────
+function mascaraMoeda(el) {
+  el.addEventListener('input', () => {
+    let v = el.value.replace(/\D/g, '');
+    if (!v) { el.value = ''; return; }
+    v = (parseInt(v, 10) / 100).toFixed(2);
+    el.value = 'R$ ' + v.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  });
+}
+function parseMoeda(str) {
+  return parseFloat(str.replace(/[R$\s\.]/g, '').replace(',', '.')) || 0;
+}
+function formatBRL(n) {
+  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+function fmtPct(n) {
+  return n.toFixed(2).replace('.', ',') + '%';
+}
+
+// ─────────────────────────────────────────────
+// AO MUDAR PARCELAMENTO
+// ─────────────────────────────────────────────
+function onParcelChange() {
+  const p = parseInt(document.getElementById('parcelas').value);
+  const display = document.getElementById('taxa-display');
+  const val = document.getElementById('taxa-display-val');
+
+  if (p && TAXAS[p]) {
+    display.classList.add('visible');
+    val.textContent = fmtPct(TAXAS[p].taxa);
+  } else {
+    display.classList.remove('visible');
+  }
+  renderCondTable(); // highlight linha ativa
+}
+
+// ─────────────────────────────────────────────
+// CÁLCULO
+// ─────────────────────────────────────────────
+function calcular() {
+  let ok = true;
+
+  const valorLiq = parseMoeda(document.getElementById('valor-liquido').value);
+  const parcSel  = parseInt(document.getElementById('parcelas').value);
+
+  // validar valor
+  const fV = document.getElementById('f-valor');
+  if (!valorLiq || valorLiq <= 0) {
+    fV.classList.add('has-error');
+    document.getElementById('valor-liquido').classList.add('error');
+    ok = false;
+  } else {
+    fV.classList.remove('has-error');
+    document.getElementById('valor-liquido').classList.remove('error');
+  }
+
+  // validar parcelas
+  const fP = document.getElementById('f-parcelas');
+  if (!parcSel || !TAXAS[parcSel]) {
+    fP.classList.add('has-error');
+    document.getElementById('parcelas').classList.add('error');
+    ok = false;
+  } else {
+    fP.classList.remove('has-error');
+    document.getElementById('parcelas').classList.remove('error');
+  }
+
+  if (!ok) return;
+
+  const taxaPct    = TAXAS[parcSel].taxa;
+  const valorBruto = valorLiq / (1 - taxaPct / 100);
+  const valorTaxa  = valorBruto - valorLiq;
+  const valorParc  = valorBruto / parcSel;
+
+  // Exibir resultado
+  const rc = document.getElementById('resultado-card');
+  rc.style.display = 'block';
+
+  document.getElementById('r-modalidade-sub').textContent = `Crédito ${parcSel}x · Taxa ${fmtPct(taxaPct)}`;
+  document.getElementById('r-total').textContent          = formatBRL(valorBruto);
+  document.getElementById('r-parcela-note').textContent   = `${parcSel} parcelas de ${formatBRL(valorParc)}`;
+  document.getElementById('r-parcela-val').textContent    = formatBRL(valorParc);
+  document.getElementById('r-liquido').textContent        = formatBRL(valorLiq);
+  document.getElementById('r-taxa-pct').textContent       = fmtPct(taxaPct);
+  document.getElementById('r-taxa-valor').textContent     = `Diferença: ${formatBRL(valorTaxa)}`;
+
+  // Dados para proposta
+  rc.dataset.liquido  = valorLiq.toFixed(2);
+  rc.dataset.bruto    = valorBruto.toFixed(2);
+  rc.dataset.taxa     = taxaPct.toFixed(2);
+  rc.dataset.parc     = parcSel;
+  rc.dataset.parval   = valorParc.toFixed(2);
+
+  renderCondTable();
+  rc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─────────────────────────────────────────────
+// COPIAR PROPOSTA WHATSAPP
+// ─────────────────────────────────────────────
+function copiarProposta() {
+  const rc      = document.getElementById('resultado-card');
+  const liquido = parseFloat(rc.dataset.liquido);
+  const bruto   = parseFloat(rc.dataset.bruto);
+  const taxa    = rc.dataset.taxa;
+  const parc    = rc.dataset.parc;
+  const parval  = parseFloat(rc.dataset.parval);
+
+  const msg =
+`Olá! Segue a simulação da sua venda com as condições Stone para óticas. 👓
+
+💳 Parcelamento: Crédito ${parc}x
+💰 Valor da venda: ${formatBRL(liquido)}
+📊 Taxa promocional: ${taxa.replace('.', ',')}%
+✅ Total para o cliente: ${formatBRL(bruto)}
+📦 Parcela: ${parc}x de ${formatBRL(parval)}
+
+_Condições da Proposta 2 Stone · Exclusivo para óticas_`;
+
+  navigator.clipboard.writeText(msg).then(() => {
+    const ok = document.getElementById('copy-ok');
+    ok.style.display = 'block';
+    setTimeout(() => { ok.style.display = 'none'; }, 3000);
+  }).catch(() => {
+    prompt('Copie o texto abaixo:', msg);
+  });
+}
+
+// ─────────────────────────────────────────────
+// LIMPAR
+// ─────────────────────────────────────────────
+function limpar() {
+  document.getElementById('valor-liquido').value = '';
+  document.getElementById('parcelas').value = '';
+  document.getElementById('resultado-card').style.display = 'none';
+  document.getElementById('taxa-display').classList.remove('visible');
+  document.querySelectorAll('.field').forEach(f => f.classList.remove('has-error'));
+  document.querySelectorAll('input, select').forEach(el => el.classList.remove('error'));
+  renderCondTable();
+}
+
+// ─────────────────────────────────────────────
+// TABELA DE CONDIÇÕES (somente leitura)
+// ─────────────────────────────────────────────
+function renderCondTable() {
+  const tbody    = document.getElementById('tbody-cond');
+  const parcAtiva = parseInt(document.getElementById('parcelas').value) || 0;
+  tbody.innerHTML = '';
+
+  Object.entries(TAXAS).forEach(([n, d]) => {
+    const tr = document.createElement('tr');
+    if (parseInt(n) === parcAtiva) tr.className = 'active-row';
+    tr.innerHTML = `
+      <td>Crédito ${n}x</td>
+      <td><strong>${fmtPct(d.taxa)}</strong></td>
+      <td style="color:var(--gray-600);font-size:0.83rem">${d.uso}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+</script>
+</body>
+</html>
